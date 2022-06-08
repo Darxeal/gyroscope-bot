@@ -1,0 +1,3 @@
+keyboard
+flask
+flask-socketio

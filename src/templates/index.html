@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gyroscope Bot</title>
+</head>
+<body>
+    <button style="width: 100%; height: 500px;" id="btn">Reset origin</button>
+    <div id="info"></div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js" integrity="sha512-q/dWJ3kcmjBLU4Qc47E4A9kTB4m3wuTY7vkFJDTZKjTs8jhyGQnaUrxa0Ytd0ssMZhbNua9hE+E7Qv1j+DyZwA==" crossorigin="anonymous"></script>
+    <script type="text/javascript" charset="utf-8">
+        try {
+            var socket = io();
+            var isEmitting = false;
+            var orientCounter = 0;
+            var lastSendTime = new Date();
+
+            function handleOrientation(event) {
+                let data = {
+                    alpha: event.alpha,
+                    beta: event.beta,
+                    gamma: event.gamma,
+                    counter: orientCounter,
+                };
+                let now = new Date();
+                if (isEmitting && now > lastSendTime.getTime() + 100) {
+                    lastSendTime = now;
+                    socket.emit('orientation', data);
+                }
+            }
+            window.addEventListener("deviceorientation", handleOrientation, true);
+
+            document.getElementById("btn").addEventListener("touchstart", (event) => {
+                isEmitting = false;
+                document.getElementById("btn").style.backgroundColor = "red";
+            });
+            document.getElementById("btn").addEventListener("touchend", (event) => {
+                isEmitting = true;
+                document.getElementById("btn").style.backgroundColor = "green";
+                orientCounter++;
+            });
+
+        } catch (error) {
+            document.getElementById("info").innerHTML = error;
+        }
+    </script>
+</body>
+</html>
